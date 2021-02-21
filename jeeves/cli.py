@@ -1,12 +1,10 @@
 import subprocess
 from dataclasses import dataclass
-from typing import List
+from typing import List, Type
 
 import setuptools
 import typer
-from dependencies import Injector
-
-app = typer.Typer()
+from dependencies import Injector, this
 
 
 @dataclass
@@ -22,9 +20,10 @@ class FindPackages:
 class Isort:
     """Format imports with isort."""
 
+    # This attribute is used as command name. FIXME not very usable.
     __name__ = 'isort'
 
-    # FIXME remove this dependency
+    # FIXME remove this dependency on FindPackages type
     directories: FindPackages
 
     def __call__(self):
@@ -52,11 +51,24 @@ class Jeeves(Injector):
     directories = FindPackages
     isort = Isort
     flakehell = FlakeHell
+    lint = [this.flakehell]
 
 
-app.command()(Jeeves.flakehell)
-app.command()(Jeeves.isort)
+def create_app(injector: Type[Injector]):
+    """Construct an app and register all commands."""
+    app = typer.Typer()
 
+    # Get all registered attributes of the injector class.
+    attributes = injector.__dependencies__.specs.keys()
+
+    for attribute in attributes:
+        cls = getattr(injector, attribute)
+        if hasattr(cls, '__name__'):
+            app.command()(cls)
+
+    return app
+
+app = create_app(Jeeves)
 
 if __name__ == '__main__':
     app()
