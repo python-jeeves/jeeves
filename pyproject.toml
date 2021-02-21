@@ -24,8 +24,14 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+[tool.poetry.scripts]
+jeeves = "jeeves.cli:app"
+
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.6,<3.10"
+typer = "^0.3.2"
+isort = "^5.7.0"
+dependencies = "^6.0.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.800"
