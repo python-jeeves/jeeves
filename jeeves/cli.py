@@ -1,10 +1,10 @@
 import subprocess
 from dataclasses import dataclass
-from typing import List, Type
+from typing import Callable, List, Type
 
 import setuptools
 import typer
-from dependencies import Injector, this
+from dependencies import Injector, value
 
 
 @dataclass
@@ -45,13 +45,57 @@ class FlakeHell:
         subprocess.run(['flakehell', 'lint', ] + self.directories())
 
 
+@dataclass
+class Lint:
+    """Check your code."""
+
+    __name__ = 'lint'
+
+    linters: List[Callable[[], None]]
+
+    def __call__(self):
+        """Run them all."""
+        for linter in self.linters:
+            linter()
+
+
+@dataclass
+class Format:
+    """Check your code."""
+
+    __name__ = 'format'
+
+    formatters: List[Callable[[], None]]
+
+    def __call__(self):
+        """Run them all."""
+        for formatter in self.formatters:
+            formatter()
+
+
 class Jeeves(Injector):
     """Default Jeeves configuration."""
 
+    # Helpers
     directories = FindPackages
+
+    # Concrete tools
     isort = Isort
     flakehell = FlakeHell
-    lint = [this.flakehell]
+
+    # Grouped tools
+    lint = Lint
+    format = Format
+
+    # noinspection PyMethodParameters
+    @value
+    def linters(flakehell):
+        return [flakehell]
+
+    # noinspection PyMethodParameters
+    @value
+    def formatters(isort):
+        return [isort]
 
 
 def create_app(injector: Type[Injector]):
