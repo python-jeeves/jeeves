@@ -1,20 +1,61 @@
 import subprocess
+from dataclasses import dataclass
+from typing import List
 
+import setuptools
 import typer
+from dependencies import Injector
 
 app = typer.Typer()
 
 
-# noinspection PyShadowingBuiltins
-@app.command()
-def format(project_directory: str):
-    """Auto format the project."""
-    subprocess.run(['isort', project_directory])
+@dataclass
+class FindPackages:
+    """Find Python packages in current directory."""
+
+    def __call__(self) -> List[str]:
+        """Use Setuptools."""
+        return setuptools.find_packages()
 
 
-@app.command()
-def lint(project_directory: str):
-    """Lint the project."""
+@dataclass
+class Isort:
+    """Format imports with isort."""
+
+    __name__ = 'isort'
+
+    # FIXME remove this dependency
+    directories: FindPackages
+
+    def __call__(self):
+        """Run isort."""
+        subprocess.run(['isort', ] + self.directories())
+
+
+@dataclass
+class FlakeHell:
+    """Find issues in code with flakehell."""
+
+    __name__ = 'flakehell'
+
+    # FIXME remove this dependency
+    directories: FindPackages
+
+    def __call__(self):
+        """Run flahekell."""
+        subprocess.run(['flakehell', 'lint', ] + self.directories())
+
+
+class Jeeves(Injector):
+    """Default Jeeves configuration."""
+
+    directories = FindPackages
+    isort = Isort
+    flakehell = FlakeHell
+
+
+app.command()(Jeeves.flakehell)
+app.command()(Jeeves.isort)
 
 
 if __name__ == '__main__':
