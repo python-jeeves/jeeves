@@ -1,11 +1,11 @@
-import subprocess
 from dataclasses import dataclass
 
 from jeeves.commands.find_packages import FindPackages
+from jeeves.commands.subprocess import Subprocess
 
 
 @dataclass
-class Isort:
+class Isort(Subprocess):
     """Format imports with isort."""
 
     # This attribute is used as command name. FIXME not very usable.
@@ -16,4 +16,4 @@ class Isort:
 
     def __call__(self):
         """Run isort."""
-        subprocess.run(['isort', ] + self.directories())
+        self.run('isort', *self.directories())

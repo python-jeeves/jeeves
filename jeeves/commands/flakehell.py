@@ -1,11 +1,11 @@
-import subprocess
 from dataclasses import dataclass
 
 from jeeves.commands.find_packages import FindPackages
+from jeeves.commands.subprocess import Subprocess
 
 
 @dataclass
-class FlakeHell:
+class FlakeHell(Subprocess):
     """Find issues in code with flakehell."""
 
     __name__ = 'flakehell'
@@ -15,4 +15,4 @@ class FlakeHell:
 
     def __call__(self):
         """Run flahekell."""
-        subprocess.run(['flakehell', 'lint', ] + self.directories())
+        self.run('flakehell', 'lint', *self.directories())

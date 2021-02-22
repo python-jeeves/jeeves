@@ -27,11 +27,13 @@ class Jeeves(Injector):
     # noinspection PyMethodParameters
     @value
     def linters(flakehell):
+        """Return list of linters."""
         return [flakehell]
 
     # noinspection PyMethodParameters
     @value
     def formatters(isort):
+        """Return list of formatters."""
         return [isort]
 
     cli_commands = ['lint', 'format']
@@ -45,9 +47,9 @@ def create_app(injector: Type[Injector]):
     attributes = injector.cli_commands
 
     for attribute in attributes:
-        cls = getattr(injector, attribute)
-        if hasattr(cls, '__name__'):
-            typer_app.command()(cls)
+        command_class = getattr(injector, attribute)
+        if hasattr(command_class, '__name__'):  # noqa: WPS421
+            typer_app.command()(command_class)
 
     return typer_app
 
