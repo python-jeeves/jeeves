@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry]
-name = "jeeves"
+name = "mister-jeeves"
 description = "Mr Jeeves will be happy to help you managing your Python project sir."
 version = "0.0.1"
 license = "MIT"
@@ -22,6 +22,10 @@ classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+packages = [
+    { include = "jeeves" },
 ]
 
 [tool.poetry.scripts]

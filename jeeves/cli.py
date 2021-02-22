@@ -1,76 +1,13 @@
-import subprocess
-from dataclasses import dataclass
-from typing import Callable, List, Type
+from typing import Type
 
-import setuptools
 import typer
 from dependencies import Injector, value
 
-
-@dataclass
-class FindPackages:
-    """Find Python packages in current directory."""
-
-    def __call__(self) -> List[str]:
-        """Use Setuptools."""
-        return setuptools.find_packages()
-
-
-@dataclass
-class Isort:
-    """Format imports with isort."""
-
-    # This attribute is used as command name. FIXME not very usable.
-    __name__ = 'isort'
-
-    # FIXME remove this dependency on FindPackages type
-    directories: FindPackages
-
-    def __call__(self):
-        """Run isort."""
-        subprocess.run(['isort', ] + self.directories())
-
-
-@dataclass
-class FlakeHell:
-    """Find issues in code with flakehell."""
-
-    __name__ = 'flakehell'
-
-    # FIXME remove this dependency
-    directories: FindPackages
-
-    def __call__(self):
-        """Run flahekell."""
-        subprocess.run(['flakehell', 'lint', ] + self.directories())
-
-
-@dataclass
-class Lint:
-    """Check your code."""
-
-    __name__ = 'lint'
-
-    linters: List[Callable[[], None]]
-
-    def __call__(self):
-        """Run them all."""
-        for linter in self.linters:
-            linter()
-
-
-@dataclass
-class Format:
-    """Check your code."""
-
-    __name__ = 'format'
-
-    formatters: List[Callable[[], None]]
-
-    def __call__(self):
-        """Run them all."""
-        for formatter in self.formatters:
-            formatter()
+from jeeves.commands.find_packages import FindPackages
+from jeeves.commands.flakehell import FlakeHell
+from jeeves.commands.format import Format
+from jeeves.commands.isort import Isort
+from jeeves.commands.lint import Lint
 
 
 class Jeeves(Injector):
@@ -97,22 +34,26 @@ class Jeeves(Injector):
     def formatters(isort):
         return [isort]
 
+    cli_commands = ['lint', 'format']
+
 
 def create_app(injector: Type[Injector]):
     """Construct an app and register all commands."""
-    app = typer.Typer()
+    typer_app = typer.Typer()
 
     # Get all registered attributes of the injector class.
-    attributes = injector.__dependencies__.specs.keys()
+    attributes = injector.cli_commands
 
     for attribute in attributes:
         cls = getattr(injector, attribute)
         if hasattr(cls, '__name__'):
-            app.command()(cls)
+            typer_app.command()(cls)
 
-    return app
+    return typer_app
+
 
 app = create_app(Jeeves)
+
 
 if __name__ == '__main__':
     app()
