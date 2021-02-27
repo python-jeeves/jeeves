@@ -8,6 +8,7 @@ from jeeves.commands.flakehell import FlakeHell
 from jeeves.commands.format import Format
 from jeeves.commands.isort import Isort
 from jeeves.commands.lint import Lint
+from jeeves.commands.mypy import Mypy
 
 
 class Jeeves(Injector):
@@ -19,6 +20,7 @@ class Jeeves(Injector):
     # Concrete tools
     isort = Isort
     flakehell = FlakeHell
+    mypy = Mypy
 
     # Grouped tools
     lint = Lint
@@ -26,9 +28,9 @@ class Jeeves(Injector):
 
     # noinspection PyMethodParameters
     @value
-    def linters(flakehell):
+    def linters(flakehell, mypy):
         """Return list of linters."""
-        return [flakehell]
+        return [flakehell, mypy]
 
     # noinspection PyMethodParameters
     @value

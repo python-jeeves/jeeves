@@ -10,4 +10,7 @@ class FindPackages:
 
     def __call__(self) -> List[str]:
         """Use Setuptools."""
-        return setuptools.find_packages()
+        return list(filter(
+            lambda package_name: '.' not in package_name,
+            setuptools.find_packages(),
+        ))

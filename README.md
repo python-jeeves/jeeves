@@ -10,27 +10,18 @@ Mr Jeeves will be happy to help you managing your Python project sir.
 
 ## Features
 
-- Fully typed with annotations and checked with mypy, [PEP561 compatible](https://www.python.org/dev/peps/pep-0561/)
-- Add yours!
+- `jeeves lint`
+  - Runs mypy and flakehell
+- `jeeves format`
+  - Auto formats the code
 
 
 ## Installation
 
 ```bash
-pip install jeeves
+pip install mister-jeeves
 ```
 
-
-## Example
-
-Showcase how your project can be used:
-
-```python
-from jeeves.example import some_function
-
-print(some_function(3, 4))
-# => 7
-```
 
 ## License
 
