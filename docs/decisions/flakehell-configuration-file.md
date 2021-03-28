@@ -1,5 +1,6 @@
 ---
 title: Flakehell configuration file
+position: 1
 ---
 
 ## Context
